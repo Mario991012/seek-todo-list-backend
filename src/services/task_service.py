@@ -42,9 +42,7 @@ class TaskService:
 
     async def update_task(self, task_id: str, task: Task) -> dict:
         try:
-            updated = await self.task_db_service.update(task_id, task.dict())
-            if not updated:
-                raise HTTPException(status_code=404, detail="Task not found")
+            await self.task_db_service.update(task_id, task.dict())
             return {"message": "Task updated successfully"}
         except HTTPException as e:
             raise e
