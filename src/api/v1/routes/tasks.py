@@ -29,3 +29,13 @@ async def get_task(task_id: str):
         task["_id"] = str(task["_id"])
         return format_response(ReturnCode.SUCCESS, task)
     raise HTTPException(status_code=404, detail="Task not found")
+
+@taskRouter.put("/{task_id}")
+async def update_task(task_id: str, task: Task):
+    task_dict = task.dict(exclude_unset=True)  # Excluir campos no modificados
+    result = await tasks_collection.update_one(
+        {"_id": ObjectId(task_id)}, {"$set": task_dict}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return format_response(ReturnCode.SUCCESS, {"message": "Task updated successfully"})
