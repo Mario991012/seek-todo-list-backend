@@ -20,4 +20,12 @@ async def get_tasks():
     tasks = await tasks_collection.find().to_list(100)  # Limitar a 100 tareas
     for task in tasks:
         task["_id"] = str(task["_id"])
-    return format_response(ReturnCode.SUCCESS, {"tasks": tasks})
+    return format_response(ReturnCode.SUCCESS, tasks)
+
+@taskRouter.get("/{task_id}")
+async def get_task(task_id: str):
+    task = await tasks_collection.find_one({"_id": ObjectId(task_id)})
+    if task:
+        task["_id"] = str(task["_id"])
+        return format_response(ReturnCode.SUCCESS, task)
+    raise HTTPException(status_code=404, detail="Task not found")
