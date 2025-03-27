@@ -11,6 +11,7 @@ class Task(BaseModel):
     title: str
     description: str
     status: TaskStatus
+    is_deleted: bool
 
 class TaskInDB(Task):
     id: Optional[str]
