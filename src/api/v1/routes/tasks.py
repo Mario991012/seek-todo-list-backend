@@ -1,41 +1,67 @@
 from fastapi import APIRouter, HTTPException
-from bson import ObjectId
-from src.core.db.mongodb.models.task import Task
+from src.services.task_service import TaskService
+from src.core.services.mongodb_service import MongoDBService
 from src.core.db.mongodb.db import tasks_collection
-from src.core.utils.response import format_response
-from src.core.common.return_codes import ReturnCode
+from src.core.schemas.response import ResponseSchema, ReturnCodeEnum
+from src.core.db.mongodb.models.task import Task
 
 taskRouter = APIRouter()
 
-@taskRouter.post("/")
+task_db_service = MongoDBService(tasks_collection)
+task_service = TaskService(task_db_service)
+
+@taskRouter.post("/", response_model=ResponseSchema)
 async def create_task(task: Task):
-    task_dict = task.dict()
-    task_dict["_id"] = ObjectId()
-    await tasks_collection.insert_one(task_dict)
-    task_dict["_id"] = str(task_dict["_id"])  # Convertir ObjectId a string
-    return format_response(ReturnCode.SUCCESS, task_dict)
+    try:
+        result = await task_service.create_task(task)
+        return ResponseSchema(
+            return_code=ReturnCodeEnum.SUCCESS,
+            data=result
+        )
+    except HTTPException as e:
+        return ResponseSchema(
+            return_code=ReturnCodeEnum.INTERNAL_ERROR,
+            data=e
+        )
 
-@taskRouter.get("/")
+@taskRouter.get("/", response_model=ResponseSchema)
 async def get_tasks():
-    tasks = await tasks_collection.find().to_list(100)  # Limitar a 100 tareas
-    for task in tasks:
-        task["_id"] = str(task["_id"])
-    return format_response(ReturnCode.SUCCESS, tasks)
+    try:
+        tasks = await task_service.get_tasks()
+        return ResponseSchema(
+            return_code=ReturnCodeEnum.SUCCESS,
+            data=tasks
+        )
+    except HTTPException as e:
+        return ResponseSchema(
+            return_code=ReturnCodeEnum.INTERNAL_ERROR,
+            data=e
+        )
 
-@taskRouter.get("/{task_id}")
+@taskRouter.get("/{task_id}", response_model=ResponseSchema)
 async def get_task(task_id: str):
-    task = await tasks_collection.find_one({"_id": ObjectId(task_id)})
-    if task:
-        task["_id"] = str(task["_id"])
-        return format_response(ReturnCode.SUCCESS, task)
-    raise HTTPException(status_code=404, detail="Task not found")
+    try:
+        task = await task_service.get_task_by_id(task_id)
+        return ResponseSchema(
+            return_code=ReturnCodeEnum.SUCCESS,
+            data=task
+        )
+    except HTTPException as e:
+        return ResponseSchema(
+            return_code=ReturnCodeEnum.INTERNAL_ERROR,
+            data=e
+        )
 
-@taskRouter.put("/{task_id}")
+@taskRouter.put("/{task_id}", response_model=ResponseSchema)
 async def update_task(task_id: str, task: Task):
-    task_dict = task.dict(exclude_unset=True)  # Excluir campos no modificados
-    result = await tasks_collection.update_one(
-        {"_id": ObjectId(task_id)}, {"$set": task_dict}
-    )
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="Task not found")
-    return format_response(ReturnCode.SUCCESS, {"message": "Task updated successfully"})
+    try:
+        result = await task_service.update_task(task_id, task)
+        return ResponseSchema(
+            return_code=ReturnCodeEnum.SUCCESS,
+            data=result
+        )
+    except HTTPException as e:
+        return ResponseSchema(
+            return_code=ReturnCodeEnum.INTERNAL_ERROR,
+            data=e
+        )
