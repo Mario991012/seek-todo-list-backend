@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional
 from enum import Enum
+from pydantic import BaseModel
+from typing import Optional
 
 class TaskStatus(str, Enum):
     todo = "por hacer"
@@ -9,7 +11,13 @@ class TaskStatus(str, Enum):
 
 class Task(BaseModel):
     title: str
-    description: str
+    description: Optional[str] = None
+    status: TaskStatus
+
+class TaskOut(BaseModel):
+    id: str
+    title: str
+    description: Optional[str] = None
     status: TaskStatus
 
 class TaskInDB(Task):
