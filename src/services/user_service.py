@@ -18,9 +18,13 @@ class UserService:
         await self.user_db_service.create(user_data)
         return user_data
 
-    async def authenticate_user(self, username: str, password: str):
+    async def get_user(self, username: str):
         users = await self.user_db_service.get({"username": username}, 1)
-        user = users[0]
+        
+        return users[0] if users else None
+
+    async def authenticate_user(self, username: str, password: str):
+        user = await self.get_user(username)
         if user and pwd_context.verify(password, user["password"]):
             return user
         return None
