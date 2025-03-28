@@ -3,16 +3,20 @@ from src.core.services.mongodb_service import MongoDBService
 from src.core.db.mongodb.models.task import Task
 from bson import ObjectId
 from typing import List, Optional
+from datetime import datetime
 
 class TaskService:
     def __init__(self, task_db_service: MongoDBService):
         self.task_db_service = task_db_service
 
+
     async def create_task(self, task: Task) -> str:
         try:
             task_dict = task.dict()
             task_dict["_id"] = ObjectId()
+            task_dict["created_at"] = datetime.utcnow()
             task_id = await self.task_db_service.create(task_dict)
+            
             task_dict["_id"] = str(task_id)
             return task_dict
         except HTTPException as e:
