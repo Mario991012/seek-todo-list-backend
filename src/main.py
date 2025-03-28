@@ -15,3 +15,9 @@ app.add_middleware(
 
 app.include_router(taskRouter, prefix="/v1/tasks", tags=["tasks"])
 app.include_router(authRouter, prefix="/v1/auth", tags=["auth"])
+
+# AWS Lambda Handler
+def handler(event, context):
+    from mangum import Mangum
+    handler = Mangum(app)
+    return handler(event, context)
