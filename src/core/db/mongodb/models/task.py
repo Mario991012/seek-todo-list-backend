@@ -8,6 +8,7 @@ class TaskStatus(str, Enum):
     todo = "por hacer"
     in_progress = "en progreso"
     completed = "completada"
+    deleted = "borrado"
 
 class Task(BaseModel):
     title: str
