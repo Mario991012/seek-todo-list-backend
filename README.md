@@ -1,6 +1,8 @@
 
 # Proyecto FastAPI
 
+![image](https://github.com/user-attachments/assets/e177a8d0-17eb-4ef1-b165-c96bef51c5fb)
+
 Este es un proyecto de FastAPI. Puedes correrlo en tu entorno utilizando Docker con el siguiente comando:
 
 ```bash
