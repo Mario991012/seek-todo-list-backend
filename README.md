@@ -19,7 +19,7 @@ El servidor de desarrollo se iniciará en `http://localhost:8000`.
 ### 1. Clona el repositorio
 
 ```bash
-git clone [<URL del repositorio>](https://github.com/Mario991012/seek-todo-list-backend.git)
+git clone https://github.com/Mario991012/seek-todo-list-backend.git
 cd seek-todo-list-backend
 ```
 
