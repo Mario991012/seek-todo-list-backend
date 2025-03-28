@@ -9,3 +9,4 @@ MONGODB_URI = os.getenv("MONGODB_URI")
 client = AsyncIOMotorClient(MONGODB_URI)
 db = client.seekTodoList
 tasks_collection = db.tasks
+users_collection = db.users
